@@ -43,7 +43,7 @@ class OrderLogService
             $totalItems = 0;
 
             foreach ($data['items'] as $cartItem) {
-                $product = Product::findOrFail($cartItem['product_id']);
+                $product = Product::where('uuid', $cartItem['product_uuid'])->firstOrFail();
                 $quantity = (int) $cartItem['quantity'];
                 $unitPrice = $product->price;
                 $lineTotal = bcmul((string) $unitPrice, (string) $quantity, 2);

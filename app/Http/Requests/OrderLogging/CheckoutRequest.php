@@ -19,7 +19,7 @@ class CheckoutRequest extends FormRequest
             'customer_name' => ['nullable', 'string', 'max:255'],
             'customer_phone' => ['nullable', 'string', 'max:32'],
             'items' => ['required', 'array', 'min:1'],
-            'items.*.product_id' => ['required', 'integer', 'exists:products,id'],
+            'items.*.product_uuid' => ['required', 'uuid', 'exists:products,uuid'],
             'items.*.quantity' => ['required', 'integer', 'min:1'],
         ];
     }
