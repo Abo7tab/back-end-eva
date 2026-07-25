@@ -85,7 +85,7 @@ class BrandService
     public function delete(Brand $brand): void
     {
         if ($brand->products()->exists()) {
-            abort(409, 'Cannot delete brand because it has products.');
+            abort(409, 'لا يمكن حذف هذا البراند لأنه يحتوي على منتجات. الرجاء حذف المنتجات أولاً أو نقلها لبراند آخر.');
         }
 
         $brand->delete();

@@ -34,6 +34,7 @@ class CategoryService
     {
         return Category::withTrashed()
             ->with('parent')
+            ->withCount('products')
             ->orderBy('sort_order')
             ->orderBy('name')
             ->paginate($perPage);
@@ -57,7 +58,7 @@ class CategoryService
      */
     public function findById(int $id): ?Category
     {
-        return Category::withTrashed()->with('parent')->find($id);
+        return Category::withTrashed()->with('parent')->withCount('products')->find($id);
     }
 
     /**
@@ -65,7 +66,7 @@ class CategoryService
      */
     public function findByUuid(string $uuid): ?Category
     {
-        return Category::withTrashed()->with('parent')->where('uuid', $uuid)->first();
+        return Category::withTrashed()->with('parent')->withCount('products')->where('uuid', $uuid)->first();
     }
 
     /**
@@ -73,7 +74,7 @@ class CategoryService
      */
     public function create(array $data): Category
     {
-        if (isset($data['parent_id'])) {
+        if (array_key_exists('parent_id', $data) && $data['parent_id'] !== null) {
             $this->guardAgainstCycle(null, (int) $data['parent_id']);
         }
 
@@ -87,7 +88,7 @@ class CategoryService
      */
     public function update(Category $category, array $data): Category
     {
-        if (isset($data['parent_id'])) {
+        if (array_key_exists('parent_id', $data) && $data['parent_id'] !== null) {
             $this->guardAgainstCycle($category->id, (int) $data['parent_id']);
         }
 
@@ -101,6 +102,14 @@ class CategoryService
      */
     public function delete(Category $category): void
     {
+        if ($category->products()->exists()) {
+            abort(409, 'لا يمكن حذف هذا القسم لأنه يحتوي على منتجات. الرجاء حذف المنتجات أولاً أو نقلها لقسم آخر.');
+        }
+
+        if ($category->children()->exists()) {
+            abort(409, 'لا يمكن حذف هذا القسم لأنه يحتوي على أقسام فرعية. الرجاء حذفها أو نقلها أولاً.');
+        }
+
         $category->delete();
         $this->flushCache();
     }
