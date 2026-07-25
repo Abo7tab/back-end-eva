@@ -9,7 +9,6 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Catalog\ReorderProductImagesRequest;
 use App\Http\Requests\Catalog\StoreProductImageRequest;
 
-use App\Domains\Catalog\Services\CloudinaryUploadService;
 
 class ProductImageController extends Controller
 {
@@ -18,22 +17,16 @@ class ProductImageController extends Controller
     public function store(
         StoreProductImageRequest $request,
         string $productUuid,
-        ProductService $productService,
-        CloudinaryUploadService $cloudinary
+        ProductService $productService
     ): ProductImageResource {
         $product = $productService->findByUuid($productUuid);
         if (!$product) {
             abort(404);
         }
         
-        $upload = $cloudinary->upload(
-            $request->file('image'),
-            'products/' . $product->uuid
-        );
-        
         $image = $product->images()->create([
-            'image_url'          => $upload['url'],
-            'storage_public_id'  => $upload['public_id'],
+            'image_url'          => $request->input('image_url'),
+            'storage_public_id'  => $request->input('storage_public_id'),
             'alt_text'           => $request->input('alt_text'),
             'sort_order'         => $request->input('sort_order', 0),
         ]);
