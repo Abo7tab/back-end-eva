@@ -194,25 +194,30 @@ class ProductService
         Product::where('id', $productId)->increment('views_count');
     }
 
-    /**
-     * Apply filter conditions to query.
-     */
     private function applyFilters(Builder $query, array $filters): void
     {
-        if (!empty($filters['brand_id'])) {
+        if (!empty($filters['brand_uuid'])) {
+            $query->whereHas('brand', fn($q) => $q->where('uuid', $filters['brand_uuid']));
+        } elseif (!empty($filters['brand_id'])) {
             $query->where('brand_id', $filters['brand_id']);
         }
 
-        if (!empty($filters['category_id'])) {
+        if (!empty($filters['category_uuid'])) {
+            $query->whereHas('category', fn($q) => $q->where('uuid', $filters['category_uuid']));
+        } elseif (!empty($filters['category_id'])) {
             $query->where('category_id', $filters['category_id']);
         }
 
         if (isset($filters['is_trending'])) {
-            $query->where('is_trending', (bool) $filters['is_trending']);
+            $query->where('is_trending', filter_var($filters['is_trending'], FILTER_VALIDATE_BOOLEAN));
         }
 
         if (isset($filters['is_featured'])) {
-            $query->where('is_featured', (bool) $filters['is_featured']);
+            $query->where('is_featured', filter_var($filters['is_featured'], FILTER_VALIDATE_BOOLEAN));
+        }
+
+        if (isset($filters['active_status'])) {
+            $query->where('active_status', filter_var($filters['active_status'], FILTER_VALIDATE_BOOLEAN));
         }
 
         if (!empty($filters['price_min'])) {
@@ -227,7 +232,8 @@ class ProductService
             $search = $filters['search'];
             $query->where(function (Builder $q) use ($search) {
                 $q->where('name', 'LIKE', "%{$search}%")
-                  ->orWhere('short_description', 'LIKE', "%{$search}%");
+                  ->orWhere('short_description', 'LIKE', "%{$search}%")
+                  ->orWhere('sku', 'LIKE', "%{$search}%");
             });
         }
     }
