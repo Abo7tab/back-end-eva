@@ -79,8 +79,11 @@ Route::prefix('v1')->group(function () {
             Route::put('/whatsapp-numbers/{uuid}', [WhatsAppNumberController::class, 'update']);
             Route::delete('/whatsapp-numbers/{uuid}', [WhatsAppNumberController::class, 'destroy']);
 
-            Route::get('/settings', [SiteSettingController::class, 'index']);
-            Route::put('/settings/{key}', [SiteSettingController::class, 'update']);
+            Route::prefix('settings')->group(function () {
+                Route::get('/', [SiteSettingController::class, 'index']);
+                Route::put('/batch', [SiteSettingController::class, 'batchUpdate']);
+                Route::put('/{key}', [SiteSettingController::class, 'update']);
+            });
 
             Route::post('/upload/image', [UploadController::class, 'image']);
             Route::delete('/upload/image', [UploadController::class, 'deleteImage']);

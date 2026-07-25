@@ -24,6 +24,15 @@ class SiteSettingController extends Controller
 
     public function update(UpdateSiteSettingsRequest $request, string $key)
     {
+        // This exists for single-key updates if needed, though bulkUpdate is called.
+        // It's better to keep it for backwards compatibility if any client uses it.
+        $settings = $request->validated('settings');
+        $this->service->bulkUpdate($settings);
+        return response()->json(['success' => true, 'data' => null, 'message' => 'Settings updated']);
+    }
+
+    public function batchUpdate(UpdateSiteSettingsRequest $request)
+    {
         $settings = $request->validated('settings');
         $this->service->bulkUpdate($settings);
 
@@ -38,6 +47,6 @@ class SiteSettingController extends Controller
             }
         }
 
-        return response()->json(['success' => true, 'data' => null, 'message' => 'Settings updated']);
+        return response()->json(['success' => true, 'data' => null, 'message' => 'Settings batch updated successfully']);
     }
 }
