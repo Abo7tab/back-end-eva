@@ -23,12 +23,14 @@ class BrandResource extends JsonResource
             'slug' => $this->slug,
             'description' => $this->description,
             'logo_url' => $this->logo_url,
+            'storage_public_id' => $this->when($request->is('api/*/admin/*'), $this->storage_public_id),
             'seo_title' => $this->seo_title,
             'meta_description' => $this->meta_description,
             'active_status' => $this->active_status,
             'sort_order' => $this->sort_order,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
+            'products_count' => $this->whenCounted('products'),
         ];
     }
 }

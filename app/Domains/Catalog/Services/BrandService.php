@@ -29,6 +29,7 @@ class BrandService
     public function listForAdmin(int $perPage = 20): LengthAwarePaginator
     {
         return Brand::withTrashed()
+            ->withCount('products')
             ->orderBy('sort_order')
             ->orderBy('name')
             ->paginate($perPage);
@@ -83,6 +84,10 @@ class BrandService
      */
     public function delete(Brand $brand): void
     {
+        if ($brand->products()->exists()) {
+            abort(409, 'Cannot delete brand because it has products.');
+        }
+
         $brand->delete();
         $this->flushCache();
     }
