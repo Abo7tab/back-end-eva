@@ -30,6 +30,8 @@ class StoreProductRequest extends FormRequest
             'is_trending'      => 'sometimes|boolean',
             'is_featured'      => 'sometimes|boolean',
             'active_status'    => 'sometimes|boolean',
+            'cover_image_url'  => 'nullable|url|max:2048',
+            'storage_public_id'=> 'nullable|string|max:255',
             'sort_order'       => 'sometimes|integer|min:0',
             'seo_title'        => 'nullable|string|max:255',
             'meta_description' => 'nullable|string|max:320',
