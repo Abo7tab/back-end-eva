@@ -32,8 +32,7 @@ class CategoryService
      */
     public function listForAdmin(int $perPage = 20): LengthAwarePaginator
     {
-        return Category::withTrashed()
-            ->with('parent')
+        return Category::with('parent')
             ->withCount('products')
             ->orderBy('sort_order')
             ->orderBy('name')

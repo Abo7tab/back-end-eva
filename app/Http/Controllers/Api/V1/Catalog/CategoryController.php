@@ -38,14 +38,14 @@ class CategoryController extends Controller
 
     public function store(StoreCategoryRequest $request)
     {
-        $category = $this->service->create($request->validated());
+        $category = $this->service->create($request->toServiceData());
         return new CategoryResource($category);
     }
 
     public function update(UpdateCategoryRequest $request, string $uuid)
     {
         $category = $this->service->findByUuid($uuid) ?? abort(404, 'Category not found');
-        $updated = $this->service->update($category, $request->validated());
+        $updated = $this->service->update($category, $request->toServiceData());
         return new CategoryResource($updated);
     }
 

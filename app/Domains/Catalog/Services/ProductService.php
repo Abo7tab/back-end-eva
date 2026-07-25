@@ -81,8 +81,7 @@ class ProductService
      */
     public function listForAdmin(array $filters, int $perPage = 20): LengthAwarePaginator
     {
-        $query = Product::withTrashed()
-            ->with(['brand', 'category', 'images']);
+        $query = Product::with(['brand', 'category', 'images']);
 
         $this->applyFilters($query, $filters);
         $this->applySorting($query, $filters['sort_by'] ?? null);

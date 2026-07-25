@@ -28,8 +28,7 @@ class BrandService
      */
     public function listForAdmin(int $perPage = 20): LengthAwarePaginator
     {
-        return Brand::withTrashed()
-            ->withCount('products')
+        return Brand::withCount('products')
             ->orderBy('sort_order')
             ->orderBy('name')
             ->paginate($perPage);
