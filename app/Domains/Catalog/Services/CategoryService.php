@@ -146,6 +146,29 @@ class CategoryService
     }
 
     /**
+     * Get the projected depth if a category is placed under $parentId.
+     */
+    public function getDepth(?int $parentId): int
+    {
+        if ($parentId === null) {
+            return 1;
+        }
+        
+        $depth = 1;
+        $current = Category::find($parentId);
+        
+        while ($current && $current->parent_id !== null) {
+            $depth++;
+            if ($depth > 10) {
+                break; // Safety infinite loop protection
+            }
+            $current = Category::find($current->parent_id);
+        }
+        
+        return $depth + 1; // +1 for the new category being added
+    }
+
+    /**
      * Flush category-related cache keys.
      */
     private function flushCache(): void
