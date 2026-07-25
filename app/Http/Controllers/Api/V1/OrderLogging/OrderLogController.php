@@ -14,7 +14,19 @@ class OrderLogController extends Controller
     public function indexAdmin(Request $request)
     {
         $perPage = (int) $request->query('per_page', 20);
-        return OrderLogResource::collection($this->service->listForAdmin($perPage));
+        $search = $request->query('search');
+        $status = $request->query('status');
+        return OrderLogResource::collection($this->service->listForAdmin($perPage, $search, $status));
+    }
+
+    public function updateStatus(Request $request, string $uuid)
+    {
+        $request->validate([
+            'status' => 'required|string|in:pending,redirected,completed,failed',
+        ]);
+        
+        $order = $this->service->updateStatus($uuid, $request->input('status'));
+        return new OrderLogResource($order);
     }
 
     public function showAdmin(string $uuid)

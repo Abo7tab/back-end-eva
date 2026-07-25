@@ -110,14 +110,41 @@ class OrderLogService
     }
 
     /**
-     * List all orders (admin, paginated).
+     * List all orders (admin, paginated, searchable).
      */
-    public function listForAdmin(int $perPage = 20): LengthAwarePaginator
+    public function listForAdmin(int $perPage = 20, ?string $search = null, ?string $status = null): LengthAwarePaginator
     {
-        return OrderLog::withTrashed()
-            ->with(['items', 'whatsappNumber'])
-            ->orderBy('created_at', 'desc')
-            ->paginate($perPage);
+        $query = OrderLog::withTrashed()->with(['items', 'whatsappNumber']);
+
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('reference_code', 'LIKE', "%{$search}%")
+                  ->orWhere('customer_name', 'LIKE', "%{$search}%")
+                  ->orWhere('customer_phone', 'LIKE', "%{$search}%");
+            });
+        }
+
+        if ($status) {
+            $query->where('status', $status);
+        }
+
+        return $query->orderBy('created_at', 'desc')->paginate($perPage);
+    }
+
+    /**
+     * Update order status (admin).
+     */
+    public function updateStatus(string $uuid, string $status): OrderLog
+    {
+        $order = OrderLog::where('uuid', $uuid)->firstOrFail();
+        
+        $validStatuses = ['pending', 'redirected', 'completed', 'failed'];
+        if (!in_array($status, $validStatuses, true)) {
+            abort(422, 'حالة الطلب غير صالحة');
+        }
+        
+        $order->update(['status' => $status]);
+        return $order->fresh();
     }
 
     /**

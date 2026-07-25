@@ -84,6 +84,7 @@ Route::prefix('v1')->group(function () {
 
             Route::get('/orders', [OrderLogController::class, 'indexAdmin']);
             Route::get('/orders/{uuid}', [OrderLogController::class, 'showAdmin']);
+            Route::patch('/orders/{uuid}/status', [OrderLogController::class, 'updateStatus']);
             Route::delete('/orders/{uuid}', [OrderLogController::class, 'destroy']);
         });
 });
