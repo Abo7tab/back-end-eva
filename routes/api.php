@@ -13,6 +13,7 @@ use App\Http\Controllers\Api\V1\OrderLogging\OrderLogController;
 use App\Http\Controllers\Api\V1\Admin\AdminAuthController;
 use App\Http\Controllers\Api\V1\Admin\AdminController;
 use App\Http\Controllers\Api\V1\Admin\UploadController;
+use App\Http\Controllers\Api\V1\Public\ThemeController;
 
 Route::prefix('v1')->group(function () {
 
@@ -30,6 +31,7 @@ Route::prefix('v1')->group(function () {
         Route::get('/products/{slug}', [ProductController::class, 'show']);
         
         Route::get('/settings', [SiteSettingController::class, 'index']);
+        Route::get('/public/theme/{theme}', [ThemeController::class, 'show']);
     });
 
     // ─── CHECKOUT (stricter rate limit) ──────────

@@ -24,7 +24,20 @@ class SiteSettingController extends Controller
 
     public function update(UpdateSiteSettingsRequest $request, string $key)
     {
-        $this->service->bulkUpdate($request->validated('settings'));
+        $settings = $request->validated('settings');
+        $this->service->bulkUpdate($settings);
+
+        foreach ($settings as $setting) {
+            $settingKey = $setting['setting_key'];
+            if (str_starts_with($settingKey, 'theme_')) {
+                // Extracts the theme name (e.g., 'default' from 'theme_default_primary_color')
+                $parts = explode('_', $settingKey);
+                if (isset($parts[1])) {
+                    \Illuminate\Support\Facades\Cache::forget("theme_config_{$parts[1]}");
+                }
+            }
+        }
+
         return response()->json(['success' => true, 'data' => null, 'message' => 'Settings updated']);
     }
 }
