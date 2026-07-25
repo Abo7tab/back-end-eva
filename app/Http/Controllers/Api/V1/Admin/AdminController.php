@@ -94,20 +94,33 @@ class AdminController extends Controller
 
     public function destroy(Request $request, int $id): JsonResponse
     {
-        $currentAdmin = $request->user();
+        try {
+            $currentAdmin = $request->user('sanctum');
 
-        if ($currentAdmin->id === $id) {
-            abort(422, 'لا يمكنك حذف حسابك الخاص');
+            if ($currentAdmin && $currentAdmin->id === $id) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'لا يمكنك حذف حسابك الخاص',
+                    'errors' => (object) [],
+                ], 422);
+            }
+
+            $admin = Admin::findOrFail($id);
+            $admin->delete();
+
+            return response()->json([
+                'success' => true,
+                'data' => (object) [],
+                'message' => 'تم حذف الأدمن بنجاح',
+            ]);
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Admin Deletion Error: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'حدث خطأ أثناء الحذف. قد يكون الأدمن مرتبطاً ببيانات أخرى.',
+                'errors' => (object) [],
+            ], 500);
         }
-
-        $admin = Admin::findOrFail($id);
-        $admin->delete();
-
-        return response()->json([
-            'success' => true,
-            'data' => (object) [],
-            'message' => 'تم حذف الأدمن بنجاح',
-        ]);
     }
 
     public function resetPassword(Request $request, int $id): JsonResponse
