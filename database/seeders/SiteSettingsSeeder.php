@@ -12,7 +12,7 @@ class SiteSettingsSeeder extends Seeder
         $settings = [
             ['setting_key' => 'seo_meta_title', 'setting_value' => 'Eva Beauty Hub', 'setting_group' => 'seo', 'value_type' => 'text'],
             ['setting_key' => 'seo_meta_description', 'setting_value' => 'Premium cosmetics and beauty products', 'setting_group' => 'seo', 'value_type' => 'textarea'],
-            ['setting_key' => 'whatsapp_order_template', 'setting_value' => 'New Order: {ref}\nTotal: {total}', 'setting_group' => 'whatsapp', 'value_type' => 'textarea'],
+            ['setting_key' => 'whatsapp_order_template', 'setting_value' => "مرحباً {customer_name} 👋\n\nشكراً لطلبك من إيفا!\n\n📞 رقم الهاتف: {customer_phone}\n🧾 رقم الطلب: {reference_code}\n\n━━━━━━━━━━━━━━━\n🛍️ منتجاتك ({total_items}):\n\n{items}\n━━━━━━━━━━━━━━━\n\n💰 المجموع الفرعي: {subtotal}\n💵 الإجمالي: {total_price}\n\nسنتواصل معك قريباً لتأكيد الطلب ✨", 'setting_group' => 'whatsapp', 'value_type' => 'textarea'],
             ['setting_key' => 'whatsapp_include_images', 'setting_value' => 'true', 'setting_group' => 'whatsapp', 'value_type' => 'boolean'],
             ['setting_key' => 'site_logo_url', 'setting_value' => null, 'setting_group' => 'general', 'value_type' => 'image'],
             ['setting_key' => 'site_favicon_url', 'setting_value' => null, 'setting_group' => 'general', 'value_type' => 'image'],

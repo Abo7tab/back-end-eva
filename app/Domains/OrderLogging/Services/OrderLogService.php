@@ -247,10 +247,12 @@ class OrderLogService
         $itemsText = '';
         foreach ($items as $index => $item) {
             $num = $index + 1;
-            $itemsText .= "{$num}. {$item['product_name_snapshot']} × {$item['quantity']} = {$item['line_total']} جنيه\n";
+            $itemsText .= "{$num}. {$item['product_name_snapshot']}\n";
+            $itemsText .= "   الكمية: {$item['quantity']} × {$item['unit_price']} ج.م = {$item['line_total']} ج.م\n";
             if ($includeImages && !empty($item['product_image_snapshot'])) {
                 $itemsText .= "   {$item['product_image_snapshot']}\n";
             }
+            $itemsText .= "\n";
         }
 
         return str_replace(
