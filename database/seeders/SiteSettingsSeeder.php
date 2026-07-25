@@ -58,9 +58,9 @@ class SiteSettingsSeeder extends Seeder
             ['setting_key' => 'contact_phone', 'setting_value' => '+201000000000', 'setting_group' => 'general', 'value_type' => 'text'],
             
             // ─── GENERAL ─────────────────
-            ['setting_key' => 'site_name', 'setting_value' => 'Eva Beauty Hub', 'setting_group' => 'general', 'value_type' => 'text'],
+            ['setting_key' => 'site_name', 'setting_value' => 'إيفا نيتنج هاب', 'setting_group' => 'general', 'value_type' => 'text'],
             ['setting_key' => 'site_tagline_ar', 'setting_value' => 'منصتك الأولى لمنتجات التجميل', 'setting_group' => 'general', 'value_type' => 'text'],
-            ['setting_key' => 'copyright_text_ar', 'setting_value' => '© 2025 Eva Beauty Hub - جميع الحقوق محفوظة', 'setting_group' => 'general', 'value_type' => 'text'],
+            ['setting_key' => 'copyright_text_ar', 'setting_value' => '© 2025 إيفا نيتنج هاب - جميع الحقوق محفوظة', 'setting_group' => 'general', 'value_type' => 'text'],
             ['setting_key' => 'business_hours_ar', 'setting_value' => 'السبت - الخميس: 9 صباحاً - 10 مساءً', 'setting_group' => 'general', 'value_type' => 'text'],
 
             // ─── CONTACT ─────────────────
