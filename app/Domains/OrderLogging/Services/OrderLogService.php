@@ -227,9 +227,6 @@ class OrderLogService
         return $prefix . str_pad((string) $nextNumber, 5, '0', STR_PAD_LEFT);
     }
 
-    /**
-     * Build WhatsApp checkout message from template.
-     */
     private function buildCheckoutMessage(
         OrderLog $order,
         array $items,
@@ -243,15 +240,38 @@ class OrderLogService
             $template = "طلب جديد #{reference_code}\nالإجمالي: {total_price}";
         }
 
+        $includeImagesStr = SiteSetting::where('setting_key', 'whatsapp_include_images')
+            ->value('setting_value');
+        $includeImages = filter_var($includeImagesStr ?? 'true', FILTER_VALIDATE_BOOLEAN);
+
         $itemsText = '';
         foreach ($items as $index => $item) {
             $num = $index + 1;
             $itemsText .= "{$num}. {$item['product_name_snapshot']} × {$item['quantity']} = {$item['line_total']} جنيه\n";
+            if ($includeImages && !empty($item['product_image_snapshot'])) {
+                $itemsText .= "   {$item['product_image_snapshot']}\n";
+            }
         }
 
         return str_replace(
-            ['{customer_name}', '{items}', '{reference_code}', '{total_price}'],
-            [$customerName, trim($itemsText), $order->reference_code, $order->total_price],
+            [
+                '{customer_name}', 
+                '{customer_phone}',
+                '{items}', 
+                '{reference_code}', 
+                '{subtotal}',
+                '{total_price}',
+                '{total_items}'
+            ],
+            [
+                $customerName, 
+                $order->customer_phone ?? '',
+                trim($itemsText), 
+                $order->reference_code, 
+                $order->subtotal,
+                $order->total_price,
+                $order->total_items
+            ],
             $template
         );
     }
