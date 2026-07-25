@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\V1\Operations\SiteSettingController;
 use App\Http\Controllers\Api\V1\OrderLogging\CheckoutController;
 use App\Http\Controllers\Api\V1\OrderLogging\OrderLogController;
 use App\Http\Controllers\Api\V1\Admin\AdminAuthController;
+use App\Http\Controllers\Api\V1\Admin\UploadController;
 
 Route::prefix('v1')->group(function () {
 
@@ -77,6 +78,9 @@ Route::prefix('v1')->group(function () {
 
             Route::get('/settings', [SiteSettingController::class, 'index']);
             Route::put('/settings/{key}', [SiteSettingController::class, 'update']);
+
+            Route::post('/upload/image', [UploadController::class, 'image']);
+            Route::delete('/upload/image', [UploadController::class, 'deleteImage']);
 
             Route::get('/orders', [OrderLogController::class, 'indexAdmin']);
             Route::get('/orders/{uuid}', [OrderLogController::class, 'showAdmin']);
