@@ -83,6 +83,7 @@ Route::prefix('v1')->group(function () {
             Route::delete('/upload/image', [UploadController::class, 'deleteImage']);
 
             Route::get('/orders', [OrderLogController::class, 'indexAdmin']);
+            Route::get('/orders/stats', [OrderLogController::class, 'stats']);
             Route::get('/orders/{uuid}', [OrderLogController::class, 'showAdmin']);
             Route::patch('/orders/{uuid}/status', [OrderLogController::class, 'updateStatus']);
             Route::delete('/orders/{uuid}', [OrderLogController::class, 'destroy']);

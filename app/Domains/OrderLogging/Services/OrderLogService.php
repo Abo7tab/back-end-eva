@@ -112,7 +112,7 @@ class OrderLogService
     /**
      * List all orders (admin, paginated, searchable).
      */
-    public function listForAdmin(int $perPage = 20, ?string $search = null, ?string $status = null): LengthAwarePaginator
+    public function listForAdmin(int $perPage = 20, ?string $search = null, ?string $status = null, ?string $sortBy = null): LengthAwarePaginator
     {
         $query = OrderLog::withTrashed()->with(['items', 'whatsappNumber']);
 
@@ -124,11 +124,40 @@ class OrderLogService
             });
         }
 
-        if ($status) {
+        if ($status && $status !== 'all') {
             $query->where('status', $status);
         }
 
-        return $query->orderBy('created_at', 'desc')->paginate($perPage);
+        switch ($sortBy) {
+            case 'oldest':
+                $query->orderBy('created_at', 'asc');
+                break;
+            case 'highest_price':
+                $query->orderBy('total_price', 'desc');
+                break;
+            case 'lowest_price':
+                $query->orderBy('total_price', 'asc');
+                break;
+            case 'newest':
+            default:
+                $query->orderBy('created_at', 'desc');
+                break;
+        }
+
+        return $query->paginate($perPage);
+    }
+
+    /**
+     * Get order stats for dashboard/admin.
+     */
+    public function getStats(): array
+    {
+        return [
+            'pending' => OrderLog::where('status', 'pending')->count(),
+            'redirected' => OrderLog::where('status', 'redirected')->count(),
+            'completed' => OrderLog::where('status', 'completed')->count(),
+            'failed' => OrderLog::where('status', 'failed')->count(),
+        ];
     }
 
     /**

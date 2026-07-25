@@ -16,7 +16,17 @@ class OrderLogController extends Controller
         $perPage = (int) $request->query('per_page', 20);
         $search = $request->query('search');
         $status = $request->query('status');
-        return OrderLogResource::collection($this->service->listForAdmin($perPage, $search, $status));
+        $sortBy = $request->query('sort_by');
+        return OrderLogResource::collection($this->service->listForAdmin($perPage, $search, $status, $sortBy));
+    }
+
+    public function stats()
+    {
+        return response()->json([
+            'success' => true,
+            'data' => $this->service->getStats(),
+            'message' => 'Stats retrieved',
+        ]);
     }
 
     public function updateStatus(Request $request, string $uuid)
