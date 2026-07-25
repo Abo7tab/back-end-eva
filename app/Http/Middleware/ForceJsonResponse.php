@@ -59,6 +59,19 @@ class ForceJsonResponse
                 ], $response->getStatusCode(), $headers);
             }
             
+            // Handle Laravel Validation Errors (422) or generic errors with message
+            if (!$response->isSuccessful() && isset($decoded['message'])) {
+                $errors = $decoded['errors'] ?? new \stdClass();
+                if (is_array($errors) && empty($errors)) {
+                    $errors = new \stdClass();
+                }
+                return new JsonResponse([
+                    'success' => false,
+                    'message' => $decoded['message'],
+                    'errors'  => $errors,
+                ], $response->getStatusCode(), $headers);
+            }
+            
             // Case D: Plain associative array
             return new JsonResponse([
                 'success' => $response->isSuccessful(),

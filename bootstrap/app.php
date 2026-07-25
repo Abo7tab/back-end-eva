@@ -31,4 +31,27 @@ return Application::configure(basePath: dirname(__DIR__))
                 ], 401);
             }
         });
+
+        $exceptions->render(function (\Throwable $e, \Illuminate\Http\Request $request) {
+            if ($request->is('api/*')) {
+                // Prevent overriding validation and auth exceptions
+                if ($e instanceof \Illuminate\Validation\ValidationException || $e instanceof \Illuminate\Auth\AuthenticationException) {
+                    return null;
+                }
+                
+                $statusCode = method_exists($e, 'getStatusCode') ? $e->getStatusCode() : 500;
+                $message = $e->getMessage();
+                if ($statusCode === 404 && empty($message)) {
+                    $message = 'Not Found';
+                } elseif (empty($message)) {
+                    $message = 'Server Error';
+                }
+
+                return response()->json([
+                    'success' => false,
+                    'message' => $message,
+                    'errors'  => (object)[],
+                ], $statusCode);
+            }
+        });
     })->create();
