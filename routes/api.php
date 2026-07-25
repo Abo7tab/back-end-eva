@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\V1\Operations\SiteSettingController;
 use App\Http\Controllers\Api\V1\OrderLogging\CheckoutController;
 use App\Http\Controllers\Api\V1\OrderLogging\OrderLogController;
 use App\Http\Controllers\Api\V1\Admin\AdminAuthController;
+use App\Http\Controllers\Api\V1\Admin\AdminController;
 use App\Http\Controllers\Api\V1\Admin\UploadController;
 
 Route::prefix('v1')->group(function () {
@@ -87,5 +88,12 @@ Route::prefix('v1')->group(function () {
             Route::get('/orders/{uuid}', [OrderLogController::class, 'showAdmin']);
             Route::patch('/orders/{uuid}/status', [OrderLogController::class, 'updateStatus']);
             Route::delete('/orders/{uuid}', [OrderLogController::class, 'destroy']);
+
+            Route::get('/users', [AdminController::class, 'index']);
+            Route::post('/users', [AdminController::class, 'store']);
+            Route::get('/users/{id}', [AdminController::class, 'show']);
+            Route::put('/users/{id}', [AdminController::class, 'update']);
+            Route::delete('/users/{id}', [AdminController::class, 'destroy']);
+            Route::patch('/users/{id}/reset-password', [AdminController::class, 'resetPassword']);
         });
 });
