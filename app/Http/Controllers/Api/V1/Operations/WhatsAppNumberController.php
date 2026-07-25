@@ -34,13 +34,38 @@ class WhatsAppNumberController extends Controller
     public function update(UpdateWhatsAppNumberRequest $request, string $uuid)
     {
         $number = $this->service->findByUuid($uuid) ?? abort(404, 'Number not found');
-        $updated = $this->service->update($number, $request->validated());
+        $data = $request->validated();
+        
+        if (isset($data['is_active']) && $data['is_active'] === false && $number->is_active) {
+            $activeCount = \App\Domains\Operations\Models\WhatsAppNumber::active()->count();
+            if ($activeCount <= 1) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'لا يمكن تعطيل آخر رقم واتساب نشط.',
+                    'errors' => (object)[],
+                ], 422);
+            }
+        }
+
+        $updated = $this->service->update($number, $data);
         return new WhatsAppNumberResource($updated);
     }
 
     public function destroy(string $uuid)
     {
         $number = $this->service->findByUuid($uuid) ?? abort(404, 'Number not found');
+        
+        if ($number->is_active) {
+            $activeCount = \App\Domains\Operations\Models\WhatsAppNumber::active()->count();
+            if ($activeCount <= 1) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'لا يمكن حذف آخر رقم واتساب نشط. يجب إبقاء رقم واحد نشط على الأقل.',
+                    'errors' => (object)[],
+                ], 422);
+            }
+        }
+        
         $this->service->delete($number);
         return response()->json(['success' => true, 'data' => null, 'message' => 'Deleted']);
     }
