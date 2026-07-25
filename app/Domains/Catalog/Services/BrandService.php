@@ -26,9 +26,13 @@ class BrandService
     /**
      * List all brands (admin, paginated).
      */
-    public function listForAdmin(int $perPage = 20): LengthAwarePaginator
+    public function listForAdmin(int $perPage = 20, ?string $search = null): LengthAwarePaginator
     {
         return Brand::withCount('products')
+            ->when($search, function ($query, $search) {
+                $query->where('name', 'like', "%{$search}%")
+                      ->orWhere('description', 'like', "%{$search}%");
+            })
             ->orderBy('sort_order')
             ->orderBy('name')
             ->paginate($perPage);
