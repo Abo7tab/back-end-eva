@@ -114,7 +114,7 @@ class OrderLogService
      */
     public function listForAdmin(int $perPage = 20, ?string $search = null, ?string $status = null, ?string $sortBy = null): LengthAwarePaginator
     {
-        $query = OrderLog::withTrashed()->with(['items', 'whatsappNumber']);
+        $query = OrderLog::with(['items', 'whatsappNumber']);
 
         if ($search) {
             $query->where(function ($q) use ($search) {
