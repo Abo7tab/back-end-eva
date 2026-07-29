@@ -5,9 +5,11 @@ return [
     'allowed_origins' => [
         'http://localhost:3000',
         'https://eva-netting-hub.vercel.app',
+        'https://eva-beauty-hub.vercel.app',
     ],
     'allowed_origins_patterns' => [
         '/^https:\/\/eva-netting-hub-.*\.vercel\.app$/',
+        '/^https:\/\/eva-beauty-hub-.*\.vercel\.app$/',
         '/^https:\/\/.*-abo7tabs-projects\.vercel\.app$/',
     ],
     'allowed_headers' => ['*'],
