@@ -22,7 +22,7 @@ class UploadController extends Controller
     {
         $request->validate([
             'image' => 'required|image|mimes:jpg,jpeg,png,webp|max:5120', // 5MB
-            'folder' => 'nullable|string|in:products,brands,categories,general',
+            'folder' => 'nullable|string|in:products,brands,categories,general,themes',
         ]);
 
         $folder = $request->input('folder', 'general');

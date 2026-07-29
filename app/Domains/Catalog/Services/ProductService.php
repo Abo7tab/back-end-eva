@@ -247,6 +247,7 @@ class ProductService
             'price_asc'  => $query->orderBy('price', 'asc'),
             'price_desc' => $query->orderBy('price', 'desc'),
             'newest'     => $query->orderBy('created_at', 'desc'),
+            'popular',
             'views'      => $query->orderBy('views_count', 'desc'),
             default      => $query->orderBy('sort_order')->orderBy('created_at', 'desc'),
         };

@@ -24,3 +24,15 @@ Homestead.yaml
 Thumbs.db
 .env.local.backup
 /storage/app/test-upload.jpg
+
+# test files
+test.js
+test2.js
+test_*.js
+test_*.ts
+test_*.php
+home.html
+vercel_html.txt
+audit.txt
+temp.css
+scratch/

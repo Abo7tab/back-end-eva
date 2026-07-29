@@ -19,7 +19,7 @@ class ProductImageResource extends JsonResource
     {
         return [
             'uuid' => $this->uuid,
-            'product_uuid' => $this->product?->uuid,
+            'product_uuid' => $this->whenLoaded('product', fn() => $this->product?->uuid, null),
             'image_url' => $this->image_url,
             'alt_text' => $this->alt_text,
             'sort_order' => $this->sort_order,

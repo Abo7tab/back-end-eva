@@ -31,7 +31,7 @@ class ProductImageController extends Controller
             'sort_order'         => $request->input('sort_order', 0),
         ]);
         
-        return new ProductImageResource($image);
+        return new ProductImageResource($image->load('product'));
     }
 
     public function reorder(ReorderProductImagesRequest $request, string $productUuid)

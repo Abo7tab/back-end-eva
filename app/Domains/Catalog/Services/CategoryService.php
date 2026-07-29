@@ -19,7 +19,10 @@ class CategoryService
             return Category::active()
                 ->root()
                 ->with(['children' => function ($query) {
-                    $query->active()->orderBy('sort_order')->orderBy('name');
+                    $query->active()
+                        ->with('parent')
+                        ->orderBy('sort_order')
+                        ->orderBy('name');
                 }])
                 ->orderBy('sort_order')
                 ->orderBy('name')
@@ -46,8 +49,11 @@ class CategoryService
     {
         return Category::active()
             ->where('slug', $slug)
+            ->with('parent')
             ->with(['children' => function ($query) {
-                $query->active()->orderBy('sort_order');
+                $query->active()
+                    ->with('parent')
+                    ->orderBy('sort_order');
             }])
             ->first();
     }
@@ -79,7 +85,7 @@ class CategoryService
 
         $category = Category::create($data);
         $this->flushCache();
-        return $category;
+        return $category->load('parent', 'children');
     }
 
     /**
@@ -93,7 +99,7 @@ class CategoryService
 
         $category->update($data);
         $this->flushCache();
-        return $category->fresh();
+        return $category->fresh(['parent', 'children']);
     }
 
     /**

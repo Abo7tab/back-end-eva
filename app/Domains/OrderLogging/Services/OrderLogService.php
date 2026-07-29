@@ -11,6 +11,7 @@ use App\Domains\OrderLogging\Models\OrderLog;
 use App\Domains\OrderLogging\Models\OrderLogItem;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 
 class OrderLogService
 {
@@ -43,8 +44,24 @@ class OrderLogService
             $totalItems = 0;
 
             foreach ($data['items'] as $cartItem) {
-                $product = Product::where('uuid', $cartItem['product_uuid'])->firstOrFail();
+                $product = Product::where('uuid', $cartItem['product_uuid'])
+                    ->where('active_status', true)
+                    ->first();
+
+                if (!$product) {
+                    throw ValidationException::withMessages([
+                        'items' => ['أحد المنتجات لم يعد متاحا. يرجى تحديث السلة.'],
+                    ]);
+                }
+
                 $quantity = (int) $cartItem['quantity'];
+
+                if ($product->stock_quantity < $quantity) {
+                    throw ValidationException::withMessages([
+                        'items' => ["الكمية المطلوبة من {$product->name} غير متوفرة. المتاح: {$product->stock_quantity}"],
+                    ]);
+                }
+
                 $unitPrice = $product->price;
                 $lineTotal = bcmul((string) $unitPrice, (string) $quantity, 2);
 
@@ -210,21 +227,42 @@ class OrderLogService
      */
     private function generateReferenceCode(): string
     {
+        $maxAttempts = 5;
         $prefix = 'GB-' . now()->format('Ym') . '-';
 
-        $lastOrder = OrderLog::withTrashed()
-            ->where('reference_code', 'LIKE', $prefix . '%')
-            ->orderBy('reference_code', 'desc')
-            ->first();
+        for ($attempt = 0; $attempt < $maxAttempts; $attempt++) {
+            try {
+                return DB::transaction(function () use ($prefix) {
+                    $lastOrder = OrderLog::withTrashed()
+                        ->where('reference_code', 'LIKE', $prefix . '%')
+                        ->lockForUpdate()
+                        ->orderBy('id', 'desc')
+                        ->first();
 
-        if ($lastOrder) {
-            $lastNumber = (int) substr($lastOrder->reference_code, -5);
-            $nextNumber = $lastNumber + 1;
-        } else {
-            $nextNumber = 1;
+                    $nextNumber = 1;
+                    if ($lastOrder) {
+                        $lastNumber = (int) substr($lastOrder->reference_code, strlen($prefix));
+                        $nextNumber = $lastNumber + 1;
+                    }
+
+                    $code = $prefix . str_pad((string) $nextNumber, 5, '0', STR_PAD_LEFT);
+
+                    if (OrderLog::withTrashed()->where('reference_code', $code)->exists()) {
+                        throw new \RuntimeException('Reference code collision');
+                    }
+
+                    return $code;
+                });
+            } catch (\Throwable $e) {
+                if ($attempt === $maxAttempts - 1) {
+                    throw $e;
+                }
+
+                usleep(random_int(10000, 50000));
+            }
         }
 
-        return $prefix . str_pad((string) $nextNumber, 5, '0', STR_PAD_LEFT);
+        throw new \RuntimeException('Failed to generate unique reference code after ' . $maxAttempts . ' attempts');
     }
 
     private function buildCheckoutMessage(
