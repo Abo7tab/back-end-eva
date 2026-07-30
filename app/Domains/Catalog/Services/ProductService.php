@@ -203,9 +203,18 @@ class ProductService
         }
 
         if (!empty($filters['category_uuid'])) {
-            $query->whereHas('category', fn($q) => $q->where('uuid', $filters['category_uuid']));
+            $categoryId = \App\Domains\Catalog\Models\Category::where('uuid', $filters['category_uuid'])->value('id');
+            if ($categoryId) {
+                $allCats = \App\Domains\Catalog\Models\Category::select('id', 'parent_id')->get()->toArray();
+                $descendants = $this->getCategoryDescendants($allCats, $categoryId);
+                $descendants[] = $categoryId;
+                $query->whereIn('category_id', $descendants);
+            }
         } elseif (!empty($filters['category_id'])) {
-            $query->where('category_id', $filters['category_id']);
+            $allCats = \App\Domains\Catalog\Models\Category::select('id', 'parent_id')->get()->toArray();
+            $descendants = $this->getCategoryDescendants($allCats, (int)$filters['category_id']);
+            $descendants[] = (int)$filters['category_id'];
+            $query->whereIn('category_id', $descendants);
         }
 
         if (isset($filters['is_trending'])) {
@@ -266,5 +275,17 @@ class ProductService
         Cache::forget('product_' . $product->slug);
         Cache::forget('products_trending');
         Cache::forget('products_featured');
+    }
+
+    private function getCategoryDescendants(array $allCategories, int $parentId): array
+    {
+        $ids = [];
+        foreach ($allCategories as $cat) {
+            if ($cat['parent_id'] === $parentId) {
+                $ids[] = $cat['id'];
+                $ids = array_merge($ids, $this->getCategoryDescendants($allCategories, $cat['id']));
+            }
+        }
+        return $ids;
     }
 }
