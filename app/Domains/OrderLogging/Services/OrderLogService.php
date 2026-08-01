@@ -129,7 +129,7 @@ class OrderLogService
     /**
      * List all orders (admin, paginated, searchable).
      */
-    public function listForAdmin(int $perPage = 20, ?string $search = null, ?string $status = null, ?string $sortBy = null): LengthAwarePaginator
+    public function listForAdmin(int $perPage = 12, ?string $search = null, ?string $status = null, ?string $sortBy = null): LengthAwarePaginator
     {
         $query = OrderLog::with(['items', 'whatsappNumber']);
 

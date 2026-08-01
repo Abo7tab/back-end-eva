@@ -44,7 +44,7 @@ class WhatsAppRoutingService
     /**
      * List all WhatsApp numbers (admin, paginated).
      */
-    public function listForAdmin(int $perPage = 20): LengthAwarePaginator
+    public function listForAdmin(int $perPage = 12): LengthAwarePaginator
     {
         return WhatsAppNumber::orderBy('is_active', 'desc')
             ->orderBy('order_count', 'asc')

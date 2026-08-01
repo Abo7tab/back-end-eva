@@ -33,7 +33,7 @@ class CategoryService
     /**
      * List all categories (admin, paginated).
      */
-    public function listForAdmin(int $perPage = 20): LengthAwarePaginator
+    public function listForAdmin(int $perPage = 12): LengthAwarePaginator
     {
         return Category::with('parent')
             ->withCount('products')

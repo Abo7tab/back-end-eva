@@ -26,7 +26,7 @@ class BrandService
     /**
      * List all brands (admin, paginated).
      */
-    public function listForAdmin(int $perPage = 20, ?string $search = null): LengthAwarePaginator
+    public function listForAdmin(int $perPage = 12, ?string $search = null): LengthAwarePaginator
     {
         return Brand::withCount('products')
             ->when($search, function ($query, $search) {

@@ -22,7 +22,7 @@ class AdminController extends Controller
             });
         }
 
-        $perPage = (int) ($request->query('per_page', 20));
+        $perPage = (int) ($request->query('per_page', 12));
         $admins = $query->latest()->paginate($perPage);
 
         return response()->json([

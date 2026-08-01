@@ -13,7 +13,7 @@ class OrderLogController extends Controller
 
     public function indexAdmin(Request $request)
     {
-        $perPage = (int) $request->query('per_page', 20);
+        $perPage = (int) $request->query('per_page', 12);
         $search = $request->query('search');
         $status = $request->query('status');
         $sortBy = $request->query('sort_by');

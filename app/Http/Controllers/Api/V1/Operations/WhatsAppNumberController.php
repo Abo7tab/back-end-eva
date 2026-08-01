@@ -15,7 +15,7 @@ class WhatsAppNumberController extends Controller
 
     public function indexAdmin(Request $request)
     {
-        $perPage = (int) $request->query('per_page', 20);
+        $perPage = (int) $request->query('per_page', 12);
         return WhatsAppNumberResource::collection($this->service->listForAdmin($perPage));
     }
 
