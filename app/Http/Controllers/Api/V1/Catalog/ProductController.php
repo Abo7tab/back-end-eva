@@ -15,7 +15,7 @@ class ProductController extends Controller
 
     public function index(Request $request)
     {
-        $perPage = (int) $request->query('per_page', 20);
+        $perPage = (int) $request->query('per_page', 12);
         return ProductResource::collection($this->service->listForPublic($request->all(), $perPage));
     }
 
@@ -37,7 +37,7 @@ class ProductController extends Controller
 
     public function indexAdmin(Request $request)
     {
-        $perPage = (int) $request->query('per_page', 20);
+        $perPage = (int) $request->query('per_page', 12);
         return ProductResource::collection($this->service->listForAdmin($request->all(), $perPage));
     }
 

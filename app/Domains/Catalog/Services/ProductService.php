@@ -15,7 +15,7 @@ class ProductService
     /**
      * List products with filters (public, paginated).
      */
-    public function listForPublic(array $filters, int $perPage = 20): LengthAwarePaginator
+    public function listForPublic(array $filters, int $perPage = 12): LengthAwarePaginator
     {
         $query = Product::active()
             ->with(['brand', 'category', 'images']);
@@ -36,7 +36,7 @@ class ProductService
                 ->trending()
                 ->with(['brand', 'category'])
                 ->orderBy('sort_order')
-                ->limit(20)
+                ->limit(12)
                 ->get();
         });
     }
@@ -51,7 +51,7 @@ class ProductService
                 ->featured()
                 ->with(['brand', 'category'])
                 ->orderBy('sort_order')
-                ->limit(20)
+                ->limit(12)
                 ->get();
         });
     }
@@ -79,7 +79,7 @@ class ProductService
     /**
      * List all products (admin, paginated).
      */
-    public function listForAdmin(array $filters, int $perPage = 20): LengthAwarePaginator
+    public function listForAdmin(array $filters, int $perPage = 12): LengthAwarePaginator
     {
         $query = Product::with(['brand', 'category', 'images']);
 
