@@ -115,6 +115,10 @@ class ProductService
      */
     public function create(array $data): Product
     {
+        if (empty($data['sku'])) {
+            $data['sku'] = 'EVA-' . strtoupper(\Illuminate\Support\Str::random(8));
+        }
+
         $product = Product::create($data);
         
         if (!empty($data['is_trending'])) {
@@ -132,6 +136,10 @@ class ProductService
      */
     public function update(Product $product, array $data): Product
     {
+        if (empty($data['sku']) && empty($product->sku)) {
+            $data['sku'] = 'EVA-' . strtoupper(\Illuminate\Support\Str::random(8));
+        }
+
         $oldSlug = $product->slug;
         $product->update($data);
 
