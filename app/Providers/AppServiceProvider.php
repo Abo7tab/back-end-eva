@@ -23,7 +23,7 @@ class AppServiceProvider extends ServiceProvider
         Model::preventLazyLoading(! $this->app->isProduction());
 
         \Illuminate\Support\Facades\RateLimiter::for('public', function (\Illuminate\Http\Request $request) {
-            return \Illuminate\Cache\RateLimiting\Limit::perMinute(120)->by($request->ip());
+            return \Illuminate\Cache\RateLimiting\Limit::perMinute(300)->by($request->ip());
         });
 
         \Illuminate\Support\Facades\RateLimiter::for('checkout', function (\Illuminate\Http\Request $request) {
