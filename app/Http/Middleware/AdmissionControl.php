@@ -22,11 +22,11 @@ class AdmissionControl
             return $next($request);
         }
 
-        $now = now();
+        $now = now()->setTimezone('Africa/Cairo');
         $hKey = $now->format('Y-m-d_H');
         $dKey = $now->format('Y-m-d');
 
-        // Track last request time
+        // Track last request time in ISO 8601
         Cache::put('health_last_request_at', $now->toIso8601String(), 3600);
 
         $inFlight = (int) Cache::get('server_inflight_count', 0);
