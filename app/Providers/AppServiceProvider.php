@@ -37,6 +37,9 @@ class AppServiceProvider extends ServiceProvider
                         \Illuminate\Support\Facades\Cache::increment('health_rate_limit_hits_today'),
                         86400
                     );
+                    $now = now();
+                    \Illuminate\Support\Facades\Cache::increment('traffic_h_' . $now->format('Y-m-d_H') . '_429');
+                    \Illuminate\Support\Facades\Cache::increment('traffic_d_' . $now->format('Y-m-d') . '_429');
 
                     return response()->json([
                         'success' => false,

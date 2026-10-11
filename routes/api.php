@@ -103,5 +103,7 @@ Route::prefix('v1')->group(function () {
 
             // ─── SERVER HEALTH MONITOR ───────────────────
             Route::get('/health', [\App\Http\Controllers\Api\V1\Admin\HealthController::class, 'index']);
+            Route::post('/health/reset', [\App\Http\Controllers\Api\V1\Admin\HealthController::class, 'reset']);
+            Route::post('/health/clear-cache', [\App\Http\Controllers\Api\V1\Admin\HealthController::class, 'clearCache']);
         });
 });

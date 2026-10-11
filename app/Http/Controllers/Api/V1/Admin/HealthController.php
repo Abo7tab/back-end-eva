@@ -7,10 +7,43 @@ use Illuminate\Support\Facades\Cache;
 
 class HealthController extends Controller
 {
+    /**
+     * Get real-time health metrics + lightweight 24h & 7d history from cache.
+     * Zero DB hits, ultra-low CPU impact.
+     */
     public function index()
     {
-        $current   = (int) Cache::get('server_inflight_count', 0);
-        $maxLimit  = 20;
+        $current  = (int) Cache::get('server_inflight_count', 0);
+        $maxLimit = 20;
+
+        // Build last 24 hours breakdown (from cache counters)
+        $hourly = [];
+        for ($i = 23; $i >= 0; $i--) {
+            $dt = now()->subHours($i);
+            $hKey = $dt->format('Y-m-d_H');
+            $hourly[] = [
+                'time'         => $dt->format('H:00'),
+                'date'         => $dt->format('Y-m-d'),
+                'served'       => (int) Cache::get("traffic_h_{$hKey}_served", 0),
+                'rate_limited' => (int) Cache::get("traffic_h_{$hKey}_429", 0),
+                'shed_503'     => (int) Cache::get("traffic_h_{$hKey}_shed", 0),
+            ];
+        }
+
+        // Build last 7 days breakdown (from cache counters)
+        $daily = [];
+        for ($i = 6; $i >= 0; $i--) {
+            $dt = now()->subDays($i);
+            $dKey = $dt->format('Y-m-d');
+            $daily[] = [
+                'day_name'     => $dt->translatedFormat('l'),
+                'date'         => $dt->format('m/d'),
+                'full_date'    => $dt->format('Y-m-d'),
+                'served'       => (int) Cache::get("traffic_d_{$dKey}_served", 0),
+                'rate_limited' => (int) Cache::get("traffic_d_{$dKey}_429", 0),
+                'shed_503'     => (int) Cache::get("traffic_d_{$dKey}_shed", 0),
+            ];
+        }
 
         return response()->json([
             'success' => true,
@@ -24,10 +57,43 @@ class HealthController extends Controller
                 'admission_rejections_total' => (int) Cache::get('health_admission_rejections', 0),
                 'admission_rejections_today' => (int) Cache::get('health_admission_rejections_today', 0),
                 'last_request_at'            => Cache::get('health_last_request_at'),
+                'hourly_history'             => $hourly,
+                'daily_history'              => $daily,
                 'php_version'                => PHP_VERSION,
                 'laravel_version'            => app()->version(),
             ],
             'message' => 'OK',
+        ]);
+    }
+
+    /**
+     * Reset stuck counters and today stats.
+     */
+    public function reset()
+    {
+        Cache::put('server_inflight_count', 0, 15);
+        Cache::put('health_rate_limit_hits_today', 0, 86400);
+        Cache::put('health_admission_rejections_today', 0, 86400);
+
+        return response()->json([
+            'success' => true,
+            'data'    => null,
+            'message' => 'تم تصفير عدادات الضغط بنجاح',
+        ]);
+    }
+
+    /**
+     * Clear application cache (flush).
+     */
+    public function clearCache()
+    {
+        Cache::flush();
+        Cache::put('server_inflight_count', 0, 15);
+
+        return response()->json([
+            'success' => true,
+            'data'    => null,
+            'message' => 'تم تفريغ كاش السيرفر بالكامل بنجاح',
         ]);
     }
 }

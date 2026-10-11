@@ -22,32 +22,40 @@ class AdmissionControl
             return $next($request);
         }
 
+        $now = now();
+        $hKey = $now->format('Y-m-d_H');
+        $dKey = $now->format('Y-m-d');
+
         // Track last request time
-        Cache::put('health_last_request_at', now()->toIso8601String(), 3600);
+        Cache::put('health_last_request_at', $now->toIso8601String(), 3600);
 
         $inFlight = (int) Cache::get('server_inflight_count', 0);
 
         if ($inFlight >= self::MAX_CONCURRENT_REQUESTS) {
-            // Track rejection stats
+            // Track rejection stats (total + today + hourly + daily)
             Cache::increment('health_admission_rejections');
             Cache::put(
                 'health_admission_rejections_today',
                 Cache::increment('health_admission_rejections_today'),
                 86400
             );
+            Cache::increment("traffic_h_{$hKey}_shed");
+            Cache::increment("traffic_d_{$dKey}_shed");
 
             return response()->json([
                 'success' => false,
                 'message' => 'الخادم مشغول حالياً بسبب كثافة الزوار، يرجى المحاولة بعد ثوانٍ قليلة.',
                 'errors'  => (object)[],
             ], 503, [
-                'Retry-After'  => '5',
+                'Retry-After'   => '5',
                 'Cache-Control' => 'no-cache, no-store, must-revalidate',
             ]);
         }
 
-        // Track total requests served
+        // Track total requests served (total + hourly + daily)
         Cache::increment('health_total_requests');
+        Cache::increment("traffic_h_{$hKey}_served");
+        Cache::increment("traffic_d_{$dKey}_served");
 
         Cache::increment('server_inflight_count');
 
