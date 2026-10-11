@@ -23,13 +23,18 @@ class AppServiceProvider extends ServiceProvider
         Model::preventLazyLoading(! $this->app->isProduction());
 
         \Illuminate\Support\Facades\RateLimiter::for('public', function (\Illuminate\Http\Request $request) {
-            return \Illuminate\Cache\RateLimiting\Limit::perMinute(50)->by($request->ip())
-                ->response(function () {
+            return \Illuminate\Cache\RateLimiting\Limit::perMinute(200)->by($request->ip())
+                ->response(function () use ($request) {
+                    \Illuminate\Support\Facades\Log::warning('Public rate limit hit', [
+                        'ip'  => $request->ip(),
+                        'url' => $request->fullUrl(),
+                    ]);
+
                     return response()->json([
                         'success' => false,
-                        'message' => 'لقد قمت بإرسال عدد كبير من الطلبات، يرجى الانتظار دقيقة والمحاولة مجدداً.',
+                        'message' => 'يرجى الانتظار بضع ثوانٍ قبل المتابعة.',
                         'errors'  => (object)[],
-                    ], 429, ['Retry-After' => '60']);
+                    ], 429, ['Retry-After' => '30']);
                 });
         });
 
