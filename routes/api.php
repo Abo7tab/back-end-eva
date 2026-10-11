@@ -100,5 +100,8 @@ Route::prefix('v1')->group(function () {
             Route::put('/users/{id}', [AdminController::class, 'update']);
             Route::delete('/users/{id}', [AdminController::class, 'destroy']);
             Route::patch('/users/{id}/reset-password', [AdminController::class, 'resetPassword']);
+
+            // ─── SERVER HEALTH MONITOR ───────────────────
+            Route::get('/health', [\App\Http\Controllers\Api\V1\Admin\HealthController::class, 'index']);
         });
 });

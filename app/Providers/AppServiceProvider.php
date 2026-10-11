@@ -30,6 +30,14 @@ class AppServiceProvider extends ServiceProvider
                         'url' => $request->fullUrl(),
                     ]);
 
+                    // Track rate limit stats for health monitor
+                    \Illuminate\Support\Facades\Cache::increment('health_rate_limit_hits');
+                    \Illuminate\Support\Facades\Cache::put(
+                        'health_rate_limit_hits_today',
+                        \Illuminate\Support\Facades\Cache::increment('health_rate_limit_hits_today'),
+                        86400
+                    );
+
                     return response()->json([
                         'success' => false,
                         'message' => 'يرجى الانتظار بضع ثوانٍ قبل المتابعة.',
