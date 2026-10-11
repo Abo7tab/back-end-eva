@@ -23,11 +23,25 @@ class AppServiceProvider extends ServiceProvider
         Model::preventLazyLoading(! $this->app->isProduction());
 
         \Illuminate\Support\Facades\RateLimiter::for('public', function (\Illuminate\Http\Request $request) {
-            return \Illuminate\Cache\RateLimiting\Limit::perMinute(300)->by($request->ip());
+            return \Illuminate\Cache\RateLimiting\Limit::perMinute(50)->by($request->ip())
+                ->response(function () {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'لقد قمت بإرسال عدد كبير من الطلبات، يرجى الانتظار دقيقة والمحاولة مجدداً.',
+                        'errors'  => (object)[],
+                    ], 429, ['Retry-After' => '60']);
+                });
         });
 
         \Illuminate\Support\Facades\RateLimiter::for('checkout', function (\Illuminate\Http\Request $request) {
-            return \Illuminate\Cache\RateLimiting\Limit::perMinute(10)->by($request->ip());
+            return \Illuminate\Cache\RateLimiting\Limit::perMinute(5)->by($request->ip())
+                ->response(function () {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'يرجى الانتظار دقيقة قبل إرسال طلب جديد.',
+                        'errors'  => (object)[],
+                    ], 429, ['Retry-After' => '60']);
+                });
         });
 
         \Illuminate\Support\Facades\RateLimiter::for('admin-login', function (\Illuminate\Http\Request $request) {

@@ -16,6 +16,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->api(prepend: [
             \App\Http\Middleware\ForceJsonResponse::class,
+            \App\Http\Middleware\AdmissionControl::class,
             \App\Http\Middleware\SecurityHeaders::class,
         ]);
 
