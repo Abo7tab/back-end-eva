@@ -18,7 +18,7 @@ use App\Http\Controllers\Api\V1\Public\ThemeController;
 Route::prefix('v1')->group(function () {
 
     // ─── PUBLIC ROUTES (no auth) ─────────────────
-    Route::middleware(['throttle:public'])->group(function () {
+    Route::middleware(['throttle:public', 'cache.public:60,300,600'])->group(function () {
         Route::get('/brands', [BrandController::class, 'index']);
         Route::get('/brands/{slug}', [BrandController::class, 'show']);
         

@@ -18,7 +18,8 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
 
         $middleware->alias([
-            'admin.auth' => \App\Http\Middleware\AdminAuthenticated::class,
+            'admin.auth'   => \App\Http\Middleware\AdminAuthenticated::class,
+            'cache.public' => \App\Http\Middleware\PublicCacheControl::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
